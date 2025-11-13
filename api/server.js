@@ -16,8 +16,8 @@ const TestUsuario= new mongoose.Schema({
 
 app.get('/usuarios', async (req, res) => {
   try {
-    const juegos = await Game.find();
-    res.json(juegos);
+    const usuarios = await Usuario.find();
+    res.json(usuarios);
   } catch (error) {
     res.json({ error: error.message });
   }
