@@ -1,4 +1,7 @@
-FROM ubuntu:latest
-LABEL authors="alvarod"
-
-ENTRYPOINT ["top", "-b"]
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["node", "server.js"]
