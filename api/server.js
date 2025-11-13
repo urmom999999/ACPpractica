@@ -25,9 +25,15 @@ app.get('/usuarios', async (req, res) => {
   }
 });
 //NEW USUARIO
-
-
-
+app.post('/usuarios', async (req, res) => {
+    try{
+    const { nombre,apellido}=req.body;
+    const newUsuario= new.Usuario({nombre,apellido});
+    await newUsuario.save();
+    } catch (error) {
+                res.json({ error: error.message });
+    }
+});
 
 //http://localhost:5000
 //INICIAR 5000
