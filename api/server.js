@@ -14,6 +14,14 @@ const TestUsuario= new mongoose.Schema({
     apellido:String})
    const Usuario= mongoose.model('Usuario',TestUsuario);
 
+app.get('/usuarios', async (req, res) => {
+  try {
+    const juegos = await Game.find();
+    res.json(juegos);
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
 
 //http://localhost:5000
 //INICIAR 5000
