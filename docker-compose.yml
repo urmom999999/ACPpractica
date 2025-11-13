@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_container
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+
+      MONGO_INITDB_ROOT_PASSWORD:
+
+
+
+
+  api:
+    build: ./api
+    container_name: api_container
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_URI=
+
+
+
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+volumes:
+  mongodb_data:
+
+
+networks:
+  app-network:
+    driver: bridge
