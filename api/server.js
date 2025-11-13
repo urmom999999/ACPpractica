@@ -15,6 +15,15 @@ const TestUsuario= new mongoose.Schema({
     nombre:String,
     apellido:String})
    const Usuario= mongoose.model('Usuario',TestUsuario);
+
+//TEST!!!!
+  app.use((req, res, next) => {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(500).json({ error: 'Database not connected' });
+    }
+    next();
+  });
+
 //GET USUARIOS
 app.get('/usuarios', async (req, res) => {
   try {
@@ -28,16 +37,16 @@ app.get('/usuarios', async (req, res) => {
 app.post('/usuarios', async (req, res) => {
     try{
     const { nombre,apellido}=req.body;
-    const newUsuario= new.Usuario({nombre,apellido});
+    const newUsuario= new Usuario({nombre,apellido});
     await newUsuario.save();
     } catch (error) {
                 res.json({ error: error.message });
     }
 });
 
-//http://localhost:5000
-//INICIAR 5000
-const PORT = 5000;
+//http://localhost:3000
+//INICIAR 3000
+const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
