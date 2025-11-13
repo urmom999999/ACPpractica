@@ -8,12 +8,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
 
-
-
       MONGO_INITDB_ROOT_PASSWORD: adminadmin
-
-
-
 
       MONGO_INITDB_DATABASE: test_base_local
     ports:
@@ -29,11 +24,9 @@ services:
     container_name: api_container
     restart: always
     ports:
-      - "3000:3000"
+      - "5000:5000"
     environment:
-      - MONGO_URI=mongodb://admin:adminadmin@mongodb.27017/test_base_local?authSource=admin
-
-
+      - MONGO_URI=mongodb://admin:adminadmin@mongodb:27017/test_base_local?authSource=admin
 
     depends_on:
       - mongodb
