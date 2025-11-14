@@ -24,7 +24,7 @@ const TestUsuario = new mongoose.Schema({
 });
 const Usuario = mongoose.model('Usuario', TestUsuario);
 
-// GET USUARIOS
+//GET USUARIOS
 app.get('/usuarios', async (req, res) => {
   try {
     const usuarios = await Usuario.find();
@@ -34,7 +34,7 @@ app.get('/usuarios', async (req, res) => {
   }
 });
 
-// NEW USUARIO
+//NEW USUARIO
 app.post('/usuarios', async (req, res) => {
   try {
     const { nombre, apellido } = req.body;
@@ -59,5 +59,5 @@ app.get('/health', (req, res) => {
 
 const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
