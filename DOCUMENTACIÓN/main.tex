@@ -1,0 +1,196 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx,float}
+\usepackage{hyperref}
+\usepackage{listings}
+\graphicspath{{imagenes/}}
+\title{Programación de Servicios y Procesos: Práctica de Docker}
+\author{Álvaro Del Valle Fernández}
+
+\begin{document}
+
+\maketitle
+
+\section{Introducción}
+El objetivo de esta práctica era crear una base de datos local, en este documento mostraré como cree los contenedores,
+ la API y la base de datos en MongoDB, usando Docker compose. \\
+ Tambien incluí un elemento .java para realizar pruebas y comprobar el correcto funcionamiento del sistema.
+\section{Requisitos Funcionales}
+\subsection{Gestión de Usuarios}
+\subsection{Comunicación entre Servicios}
+\begin{itemize}
+    \item \textbf{RF-01}: Debe conectarse de forma automatica una vez iniciada
+    \item \textbf{RF-02}: Debe notificar de posibles errores
+    \item \textbf{RF-03}: Comunicacion mediante Docker
+\end{itemize}
+
+\subsection{Operaciones del Sistema}
+\begin{itemize}
+    \item \textbf{RF-04}: Los datos deben de persistir dentro de la base de datos
+\end{itemize}
+
+
+\section{Requisitos No Funcionales}
+\begin{itemize}
+    \item \textbf{RNF-01}: Debe de funcionar de forma fluida y sin esperas demasiado largas.
+    \item \textbf{RNF-02}: Debe de estar organizado de forma modular permitiendo mejoras de forma sencilla.
+\end{itemize}
+
+\section{Arquitectura}
+El sistema se compone de los siguientes servicios: base de datos:MongoDB, api: node.js 
+Donde Docker Compose se encarga de gestionar estos contenedores.
+
+\subsection{Flujo de Datos}
+\begin{enumerate}
+    \item Al iniciar se conecta al puerto adecuado automaticamente.
+    \item La API gestiona la petición
+    \item La API se conecta a MongoDB mendiante Docker
+    \item MongoDB devuelve los resultados
+    \item La API devuelve la respuesta al usuario
+\end{enumerate}
+\section{Clases Principales}
+\subsection{Archivo Docker Compose}
+\begin{lstlisting}
+    version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_container
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: adminadmin
+      MONGO_INITDB_DATABASE: test_base_local
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+  api:
+    build: ./api
+    container_name: api_container
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_URI=mongodb://admin:adminadmin@mongodb:27017/test_base_local?authSource=admin
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  app-network:
+    driver: bridge
+\end{lstlisting}
+
+\subsection{Archivo Dockerfile}
+\begin{lstlisting}
+    FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["node", "server.js"]
+\end{lstlisting}
+
+\subsection{Archivo package.json}
+\begin{lstlisting}
+    {
+  "name": "test-api",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "cors": "^2.8.5"
+  }
+}
+\end{lstlisting}
+
+\subsection{Archivo server.js}
+\begin{lstlisting}
+    const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+//LOCAL!!
+//mongoose.connect('mongodb+srv://Admin:Admin420420@backenddb.f4b02ek.mongodb.net/?retryWrites=true&w=majority&appName=BackendDB')
+//MONGO_URI=mongodb://admin:adminadmin@mongodb:27017/test_base_local?authSource=admin
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://admin:adminadmin@mongodb:27017/test_base_local?authSource=admin';
+
+mongoose.connect(MONGO_URI)
+  .then(() => {
+    console.log('Conectado');
+  })
+  .catch((error) => {
+    console.error('Error conectandose:', error.message);
+  });
+
+const TestUsuario = new mongoose.Schema({
+  nombre: String,
+  apellido: String
+});
+const Usuario = mongoose.model('Usuario', TestUsuario);
+
+// GET USUARIOS
+app.get('/usuarios', async (req, res) => {
+  try {
+    const usuarios = await Usuario.find();
+    res.json(usuarios);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// NEW USUARIO
+app.post('/usuarios', async (req, res) => {
+  try {
+    const { nombre, apellido } = req.body;
+    const newUsuario = new Usuario({ nombre, apellido });
+    await newUsuario.save();
+    res.status(201).json({
+      message: 'Usuario creado',
+      usuario: newUsuario
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+});
+\end{lstlisting}
+\section{Tecnologías Usadas}
+\subsection{Plataforma de Contenedores}
+Docker ultima versión \\
+Docker Compose version 3.8
+\subsection{Base de Datos}
+MongoDB ultima versión
+\subsection{Backend}
+Node.js 18-alpine 
+\subsection{Comandos Principales}
+\begin{lstlisting}[caption=Comandos principales]
+docker-compose up
+
+docker-compose down
+
+docker-compose up --build
+\end{lstlisting}
+\end{document}
