@@ -46,3 +46,11 @@ jobs:
           echo "Imagen construida y subida exitosamente:"
           echo "  - Imagen: ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_TAG }}"
           echo "  - Docker Hub: https://hub.docker.com/r/${{ secrets.DOCKER_USERNAME }}/ejemplo-api-docker"
+
+      - name: Discord
+        if: success()
+        uses: Ilshidur/action-discord@master
+        env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+        args: 'Subido a Docker correctamente'         

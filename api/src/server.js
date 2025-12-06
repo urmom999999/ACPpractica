@@ -1,7 +1,8 @@
-const express = require('express');
+
+/*const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-
+const app = require('./server');
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -14,7 +15,7 @@ app.use(express.json());
 //LOCAL!!
 //mongoose.connect('mongodb+srv://Admin:Admin420420@backenddb.f4b02ek.mongodb.net/?retryWrites=true&w=majority&appName=BackendDB')
 //MONGO_URI=mongodb://admin:adminadmin@mongodb:27017/test_base_local?authSource=admin
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://admin:adminadmin@mongodb:27017/test_base_local?authSource=admin';
+mongoose.connect('mongodb+srv://alvarod_db_user:djB9u4FbJXd4wdLI@clusterrestaurante.eef3ovc.mongodb.net/restaurante?appName=ClusterRestaurante')
 
 mongoose.connect(MONGO_URI)
   .then(() => {
@@ -55,15 +56,16 @@ app.post('/usuarios', async (req, res) => {
   }
 });
 
-/*
+
 app.get('/health', (req, res) => {
   res.json({
     status: 'API is running',
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
-});*/
+});
 
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
+*/

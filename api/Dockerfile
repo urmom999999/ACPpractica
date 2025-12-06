@@ -1,7 +1,9 @@
 FROM node:18-alpine
 WORKDIR /usr/src/app
-COPY package*.json ./
-RUN npm install
-COPY src/ ./
+COPY src/package*.json ./
+RUN npm install --only=production
+#COPY src/ ./
+COPY . .
 EXPOSE 3000
-CMD ["node", "server.js"]
+#posible error aqui?
+CMD ["npm", "start"]
