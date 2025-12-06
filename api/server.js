@@ -1,4 +1,74 @@
 
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+let usuarios = [
+  { id: 1, username: 'admin', password: '123' },
+  { id: 2, username: 'user1', password: '456' }
+];
+
+//rutas http://localhost:3000/
+app.get('/', (req, res) => {
+  res.json({
+    mensaje: 'API funcionando',
+    endpoints: [
+      'GET /users',
+      'POST /users',
+      'POST /login'
+    ]
+  });
+});
+
+//GET USUARIO
+app.get('/users', (req, res) => {
+  res.json({
+    usuarios: usuarios.map(u => ({ id: u.id, username: u.username }))
+  });
+});
+
+//CREAR USUARIO
+app.post('/users', (req, res) => {
+  const { username, password } = req.body;
+  
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Faltan datos' });
+  }
+  
+  const nuevoId = usuarios.length > 0 ? Math.max(...usuarios.map(u => u.id)) + 1 : 1;
+  const nuevoUsuario = { id: nuevoId, username, password };
+  
+  usuarios.push(nuevoUsuario);
+  
+  res.status(201).json({
+    mensaje: 'Usuario creado',
+    usuario: { id: nuevoId, username }
+  });
+});
+
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  
+  const usuario = usuarios.find(u => 
+    u.username === username && u.password === password
+  );
+  
+  if (usuario) {
+    res.json({
+      mensaje: 'Login correcto',
+      usuario: { id: usuario.id, username: usuario.username }
+    });
+  } else {
+    res.status(401).json({ error: 'Credenciales incorrectas' });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor en http://localhost:${PORT}`);
+});
+
+
 /*const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');

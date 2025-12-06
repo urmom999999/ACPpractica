@@ -1,7 +1,6 @@
 {
   "name": "ejemplo-api",
   "version": "1.0.0",
-  "description": "API con Express y PostgreSQL",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
