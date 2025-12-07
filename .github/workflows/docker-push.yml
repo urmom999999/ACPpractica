@@ -43,16 +43,49 @@ jobs:
         cache-from: type=registry,ref=${{ env.DOCKER_IMAGE_NAME }}:buildcache
         cache-to: type=inline
         
-    - name: Mostrar información de la imagen
-      run: |
-        echo "Imagen construida y subida exitosamente:"
-        echo " - Imagen: ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_TAG }}"
-        echo " - Docker Hub: https://hub.docker.com/r/${{ secrets.DOCKER_USERNAME }}/ejemplo-api-docker"
+   # - name: Mostrar información de la imagen
+    #  run: |
+     #   echo "Imagen construida y subida exitosamente:"
+      #  echo " - Imagen: ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_TAG }}"
+       # echo " - Docker Hub: https://hub.docker.com/r/${{ secrets.DOCKER_USERNAME }}/ejemplo-api-docker"
         
-    - name: Enviar notificación a Discord
+  #  - name: Enviar notificación a Discord
+  #    if: success()
+  #    uses: Ilshidur/action-discord@master
+   #   env:
+    #    DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+     # with:
+      #  args: 'Imagen pusheada correctamente'
+    - name: Notify Discord - SUCCESS
       if: success()
-      uses: Ilshidur/action-discord@master
-      env:
-        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      uses: sarisia/actions-status-discord@v1
       with:
-        args: 'Imagen pusheada correctamente'
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        title: "DEPLOY EXITOSO - Docker Image"
+        description: |
+          **Imagen construida y subida correctamente**
+          
+           **Imagen:** `${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_TAG }}`
+           **Tag:** v1.0.0
+           **Estado:** Success
+           **URL:** https://hub.docker.com/r/${{ secrets.DOCKER_USERNAME }}/api-simple
+          
+          *Desplegado automáticamente desde GitHub Actions*
+        username: "Docker Deploy Bot"
+        avatar_url: "https://cdn-icons-png.flaticon.com/512/919/919853.png"
+        
+    - name: Notify Discord - FAILURE
+      if: failure()
+      uses: sarisia/actions-status-discord@v1
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        title: "DEPLOY FALLIDO - Docker Image"
+        description: |
+          **Fallo al construir o subir la imagen Docker**
+          
+           **Imagen:** `${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_TAG }}`
+           **Estado:** Failed
+           **Workflow:** ${{ github.workflow }}
+          
+          *Revisa los logs de GitHub Actions*
+        username: "Docker Deploy Bot"
